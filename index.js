@@ -35,7 +35,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    "Origin, X-reqed-With, Content, Accept, Content-Type, Authorization"
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -335,49 +335,59 @@ app.get('/menu', (req,res) =>{
 
 })
 
-
-app.post('/auth/signup', (req,res) =>{
+//==========login
+app.post('/auth/signup', async (req,res) =>{
   res.header("Access-Control-Allow-Origin", "*");
-  bcrypt.hash(req.body.password, 10)
-  .then((hashedPassword) => {
-      console.log(hashedPassword)
+  //hash the password
+  bcrypt
+    .hash(req.body.password, 10)
+    .then((hashedPassword) => {
+      // create a new user instance and collect the data
       const user = new User({
-          fullname: req.body.fullname,
-          password: hashedPassword,
+        fullname:req.body.fullname,
+        password: hashedPassword,
+        role:req.body.role
       });
-      user.save().then((result) => {
+
+      // save the new user
+      user
+        .save()
+        // return success if the new user is added to the database successfully
+        .then((result) => {
           res.status(201).send({
             message: "User Created Successfully",
             result,
           });
         })
+        // catch error if the new user wasn't added successfully to the database
         .catch((error) => {
           res.status(500).send({
             message: "Error creating user",
             error,
           });
         });
-  })
-  .catch((e) => {
-    res.status(500).send({
-      message: "Password was not hashed successfully",
-      e,
+    })
+    // catch error if the password hash isn't successful
+    .catch((e) => {
+      res.status(500).send({
+        message: "Password was not hashed successfully",
+        e,
+      });
     });
-  });
   
 })
 
 
 // login endpoint
-app.post("/login", (request, response) => {
+app.post("/login", (req, response) => {
   // check if email exists
-  User.findOne({ fullname: request.body.fullname })
+  User.findOne({ fullname: req.body.fullname })
 
     // if email exists
     .then((user) => {
       // compare the password entered and the hashed password found
       bcrypt
-        .compare(request.body.password, user.password)
+        .compare(req.body.password, user.password)
 
         // if the passwords match
         .then((passwordCheck) => {
@@ -400,9 +410,10 @@ app.post("/login", (request, response) => {
           );
 
           //   return success response
-          response.status(200).send({
+          response.send({
             message: "Login Successful",
             fullname: user.fullname,
+            role:user.role,
             token,
           });
         })
@@ -424,12 +435,12 @@ app.post("/login", (request, response) => {
 });
 
 // free endpoint
-app.get("/free", (request, response) => {
+app.get("/free", (req, response) => {
   response.json({ message: "You are free to access me anytime" });
 });
 
 // authentication endpoint
-app.get("/auth",auth, (request, response) => {
+app.get("/auth",auth, (req, response) => {
   response.json({ message: "You are authorized to access me" });
 });
 
