@@ -29,7 +29,7 @@ app.options("/update/list_mon", (req, res) => {
   res.sendStatus(204);
 });
 app.use(cors({
-  origin: 'http://localhost:3000'
+  origin: 'http://localhost:3000'|| 'https://fe-drink-pos.vercel.app/'
 }));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
