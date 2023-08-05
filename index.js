@@ -12,7 +12,7 @@ const User_Schema = require ("./models/userModel")
 const Mon = require("./models/monModel")
 const Order= require("./models/OrderDetailModel")
 const auth = require("./auth");
-
+const reveune = require('./models/ReveuneModel')
 
 const app = express();
 
@@ -89,6 +89,7 @@ const Nhomvattu = mongoose.model("Nhomvattu",Type)
 const Vattu = mongoose.model("Material",Material)
 const Monan = mongoose.model("Mon",Mon)
 const OrderDetail = mongoose.model("Order",Order)
+const Reveune = mongoose.model("Reveune",reveune)
 
 ///===============API================
 //=====DONVI
@@ -229,11 +230,13 @@ app.put('/update/list_mon/:_id',(req,res) =>{
   }
 
   Vattu.updateOne(myQuerry,newValues)
-  .then(function(){
-    res.send({status:"Updated"}); // Success
-  }).catch(function(error){
-      console.log(error); // Failure
-  });
+  .then((obj) => {
+    console.log('Updated - ' + obj);
+    res.redirect('orders')
+  })
+  .catch((err) => {
+      console.log('Error: ' + err);
+  })
   
 })
 app.post('/delete/list_mon/:_id',(req,res) =>{
@@ -253,7 +256,7 @@ app.post('/delete/list_mon/:_id',(req,res) =>{
 //=========Tạo công thức và món
 app.post('/themmon', (req,res) =>{
   res.header("Access-Control-Allow-Origin", "*");
-  console.log(req.body)
+  //console.log(req.body)
   let mon = new Monan(req.body)
   mon.save()
 })
@@ -283,6 +286,12 @@ app.post('/add_order_detail', (req,res) =>{
   res.header("Access-Control-Allow-Origin", "*");
   const order = new OrderDetail(req.body)
   order.save()
+})
+
+app.post('/reveune_day', (req,res) =>{
+  res.header("Access-Control-Allow-Origin", "*");
+  const REV = new Reveune(req.body)
+  REV.save()
 })
 
 app.get("/filter_order/:t",(req,res)  =>{
@@ -449,4 +458,3 @@ app.get("/auth",auth, (req, response) => {
 app.listen (5000, () =>{
     console.log("serer is running on port 5000,http://localhost:5000/")
 })
-
