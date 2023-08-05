@@ -17,10 +17,9 @@ const userSchema = mongoose.Schema(
             type:String,
             require: true
         },
-        role:{
+	role:{
             type:String,
         }
-        
     }
 )
 
